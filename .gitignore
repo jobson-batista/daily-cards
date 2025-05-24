@@ -1,0 +1,61 @@
+# === Xcode ===
+*.xcuserstate
+*.xccheckout
+*.moved-aside
+*.xcworkspace/xcuserdata/
+*.xcuserdatad/
+xcuserdata/
+
+# Project user data
+*.mode1v3
+*.mode2v3
+*.perspectivev3
+*.pbxuser
+
+# Build products
+build/
+DerivedData/
+*.hmap
+*.ipa
+*.app
+*.dSYM.zip
+*.dSYM
+
+# Index and logs
+.idea/
+*.xcscmblueprint
+*.xcsettings
+*.xcodeproj/project.xcworkspace/xcuserdata/
+
+# Swift Package Manager
+.swiftpm/
+.build/
+
+# CocoaPods
+Pods/
+Podfile.lock
+Podfile~
+project.xcworkspace/
+
+# Carthage
+Carthage/Build/
+
+# Fastlane
+fastlane/report.xml
+fastlane/Preview.html
+fastlane/screenshots/
+fastlane/test_output/
+
+# Firebase crashlytics
+*.symbols
+
+# Archives
+*.xcarchive
+
+# Xcode automatic backup files
+*.xcbackup
+
+# Misc
+.DS_Store
+*.orig
+*.swp

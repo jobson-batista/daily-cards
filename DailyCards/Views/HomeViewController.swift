@@ -7,11 +7,14 @@
 
 import UIKit
 
-class ViewController: UIViewController {
+class HomeViewController: UIViewController {
+    
+    public var coordinator: AppCoordinator?
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view.
+        print("Rodando...")
+        view.backgroundColor = .systemCyan
     }
 
 
