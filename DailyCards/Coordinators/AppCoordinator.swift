@@ -17,6 +17,7 @@ class AppCoordinator: Coordinator {
     }
     
     func start() {
+        //let homeViewController: CardViewController = CardViewController()
         let homeViewController: HomeViewController = HomeViewController()
         homeViewController.coordinator = self
         navigationController.pushViewController(homeViewController, animated: true)

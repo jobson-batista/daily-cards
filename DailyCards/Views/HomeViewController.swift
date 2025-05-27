@@ -1,16 +1,19 @@
 //
-//  ViewController.swift
+//  HomeViewController.swift
 //  DailyCards
 //
-//  Created by Jobson on 24/05/25.
+//  Created by Jobson on 25/05/25.
 //
 
 import UIKit
 
-class HomeViewController: UIViewController {
-    
+class HomeViewController: UIViewController, ViewProtocol, UITableViewDelegate, UITableViewDataSource, UISearchResultsUpdating {
+  
     public var coordinator: AppCoordinator?
-    var isFlipped = false
+    private var cardModelView: CardModelView = CardModelView.shared
+    private var categoryModelView: CategoryModelView = CategoryModelView.shared
+    private var categories: [Category] = []
+    private var categoriesFiltred: [Category] = []
     
     public lazy var stackView: UIStackView = {
         var stack = UIStackView()
@@ -21,133 +24,115 @@ class HomeViewController: UIViewController {
         return stack
     }()
     
-    public lazy var titleLabel: UILabel = {
-        var label = UILabel()
-        label.translatesAutoresizingMaskIntoConstraints = false
-        label.text = "Daily Cards"
-        label.font = UIFont.systemFont(ofSize: 30, weight: .medium)
-        return label
+    public lazy var tableView: UITableView = {
+        var tableView = UITableView()
+        tableView.translatesAutoresizingMaskIntoConstraints = false
+        tableView.backgroundColor = .backgroud
+        tableView.separatorStyle = .none
+        return tableView
     }()
     
-    public lazy var cardView: UIView = {
-        var view = UIView()
-        view.translatesAutoresizingMaskIntoConstraints = false
-        view.backgroundColor = .systemGray5
-        view.layer.cornerRadius = 10
-        view.clipsToBounds = true
-        return view
-    }()
-    
-    public lazy var questionLabel: UILabel = {
-        var label = UILabel()
-        label.translatesAutoresizingMaskIntoConstraints = false
-        label.text = "O que é Swift?"
-        label.font = UIFont.systemFont(ofSize: 30, weight: .light)
-        return label
-    }()
-    
-    public lazy var answerLabel: UILabel = {
-        var label = UILabel()
-        label.translatesAutoresizingMaskIntoConstraints = false
-        label.text = "Uma linguagem de programação"
-        label.font = UIFont.systemFont(ofSize: 30, weight: .light)
-        label.isHidden = true
-        label.numberOfLines = 0
-        label.lineBreakMode = .byWordWrapping
-        return label
-    }()
-    
-    public lazy var buttonAnswer: UIButton = {
-        var button = UIButton()
+    public lazy var createCategoryButton: UIButton = {
+        let button = UIButton()
         button.translatesAutoresizingMaskIntoConstraints = false
-        button.setTitle("Mostrar Resposta", for: .normal)
-        button.setTitleColor(.white, for: .normal)
-        button.layer.cornerRadius = 10
-        button.backgroundColor = .systemBlue
-        button.addTarget(self, action: #selector(flipCard), for: .touchUpInside)
-        button.addTarget(self, action: #selector(buttonTouchDown), for: .touchDown)
-        button.addTarget(self, action: #selector(buttonTouchUp), for: [.touchUpInside, .touchUpOutside, .touchCancel])
+        button.layer.cornerRadius = 5
+        button.backgroundColor = .buttonPrimary
+        button.tintColor = .textPrimary
+        button.setTitle("Criar Categoria", for: .normal)
+        button.setImage(UIImage(systemName: "plus"), for: .normal)
         return button
     }()
     
-    public lazy var buttonNextCard: UIButton = {
-        var button = UIButton()
-        button.translatesAutoresizingMaskIntoConstraints = false
-        button.setTitle("Próximo Card", for: .normal)
-        button.layer.cornerRadius = 10
-        button.setTitleColor(.white, for: .normal)
-        button.backgroundColor = .systemBlue
-        button.addTarget(self, action: #selector(buttonTouchDown), for: .touchDown)
-        button.addTarget(self, action: #selector(buttonTouchUp), for: [.touchUpInside, .touchUpOutside, .touchCancel])
-        return button
-    }()
-
     override func viewDidLoad() {
         super.viewDidLoad()
-        print("Rodando...")
-        view.backgroundColor = .systemBackground
+        Log.info("Rodando... \(String(describing: type(of: self)))")
+        view.backgroundColor = .backgroud
+        categories = categoryModelView.fetchData()
+        categoriesFiltred = categories
         
+        setupNavigationItem()
         setupHierarchy()
         setupConstraints()
+        setupTableView()
     }
     
     func setupConstraints() {
         NSLayoutConstraint.activate([
-            
             stackView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
             stackView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
             stackView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 20),
             stackView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -20),
-                 
-            questionLabel.centerYAnchor.constraint(equalTo: cardView.centerYAnchor),
-            questionLabel.centerXAnchor.constraint(equalTo: cardView.centerXAnchor),
             
-            answerLabel.centerYAnchor.constraint(equalTo: cardView.centerYAnchor),
-            answerLabel.centerXAnchor.constraint(equalTo: cardView.centerXAnchor),
-            answerLabel.leadingAnchor.constraint(equalTo: cardView.leadingAnchor, constant: 20),
-            answerLabel.trailingAnchor.constraint(equalTo: cardView.trailingAnchor, constant: -20),
-            
-            buttonAnswer.heightAnchor.constraint(equalToConstant: 50),
-            buttonNextCard.heightAnchor.constraint(equalToConstant: 50),
+            createCategoryButton.heightAnchor.constraint(equalToConstant: 50),
             
         ])
     }
     
     func setupHierarchy() {
-        cardView.addSubview(questionLabel)
-        cardView.addSubview(answerLabel)
-        
-        stackView.addArrangedSubview(titleLabel)
-        stackView.addArrangedSubview(cardView)
-        stackView.addArrangedSubview(buttonAnswer)
-        stackView.addArrangedSubview(buttonNextCard)
+        stackView.addArrangedSubview(tableView)
+        stackView.addArrangedSubview(createCategoryButton)
         
         view.addSubview(stackView)
     }
     
-    @objc func flipCard() {
-        let fromView = isFlipped ? answerLabel : questionLabel
-        let toView = isFlipped ? questionLabel : answerLabel
-            
-        let options: UIView.AnimationOptions = isFlipped ? .transitionFlipFromLeft : .transitionFlipFromRight
-//        let options: UIView.AnimationOptions = isFlipped ? .transitionCurlDown : .transitionCurlUp
-            
-        UIView.transition(from: fromView, to: toView, duration: 0.8, options: [options, .showHideTransitionViews], completion: nil)
-            
-        isFlipped.toggle()
+    func setupNavigationItem() {
+        self.navigationItem.title = "Categorias de Estudo"
+        let searchController = UISearchController()
+        searchController.searchResultsUpdater = self
+        searchController.searchBar.placeholder = "Buscar categoria"
+        searchController.isActive = true
+        self.navigationItem.searchController = searchController
     }
     
-    @objc func buttonTouchDown(_ sender: UIButton) {
-        UIView.animate(withDuration: 0.1) {
-            sender.alpha = 0.6
-        }
+    func setupTableView() {
+        tableView.dataSource = self
+        tableView.delegate = self
+        
+        tableView.register(CategoryCell.self, forCellReuseIdentifier: CategoryCell.identifier)
     }
-
-    @objc func buttonTouchUp(_ sender: UIButton) {
-        UIView.animate(withDuration: 0.1) {
-            sender.alpha = 1.0
+    
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return categoriesFiltred.count
+    }
+    
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: CategoryCell.identifier, for: indexPath) as? CategoryCell else {
+            return UITableViewCell()
         }
+
+        let category = categoriesFiltred[indexPath.row]
+        
+        cell.label.text = category.name
+        cell.labelDescription.text = category.description
+        cell.image.image = UIImage(systemName: category.imageSystemName)
+
+        return cell
+    }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        Log.info("Selecionou: \(categoriesFiltred[indexPath.row].name)")
+        tableView.deselectRow(at: indexPath, animated: true)
+    }
+    
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        return 100.0
+    }
+    
+    func updateSearchResults(for searchController: UISearchController) {
+        guard let text = searchController.searchBar.text else {
+            Log.error("Erro ao buscar categoria.")
+            return
+        }
+        
+        if !text.isEmpty {
+            self.categoriesFiltred = categories.filter({ category in
+                category.name.localizedCaseInsensitiveContains(text) ||
+                category.description.localizedCaseInsensitiveContains(text)
+            })
+        } else {
+            self.categoriesFiltred = self.categories
+        }
+        tableView.reloadData()
     }
 
 }
-
