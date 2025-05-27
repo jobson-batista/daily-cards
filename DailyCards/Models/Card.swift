@@ -7,18 +7,32 @@
 
 import Foundation
 
-class Card {
+class Card: ModelBase {
     
+    var uuid: UUID
     var question: String
     var answer: String
-    var deleted: Bool
-    var category: String
+    var category: Category
     
-    init(question: String, answer: String, category: String) {
+    var createdAt: Date
+    var updatedAt: Date
+    var deletedAt: Date?
+    
+    init(question: String, answer: String, category: Category) {
+        self.uuid = UUID()
         self.question = question
         self.answer = answer
         self.category = category
-        self.deleted = false
+        self.createdAt = Date.now
+        self.updatedAt = Date.now
+        self.deletedAt = nil
+    }
+    
+    public func isDeleted() -> Bool {
+        if let deleted = self.deletedAt {
+            return true
+        }
+        return false
     }
     
 }
