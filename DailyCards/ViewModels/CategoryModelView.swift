@@ -15,20 +15,7 @@ class CategoryModelView {
         Category(name: "English", cards: [], description: "Basic words and phrases", imageSystemName: "globe"),
         Category(name: "Java Studies", cards: [], description: "Basic java sintax", imageSystemName: "cup.and.heat.waves.fill"),
         Category(name: "Swift and UIKit", cards: [], description: "Studies of iOS Development", imageSystemName: "swift"),
-        
-        Category(name: "English", cards: [], description: "Basic words and phrases", imageSystemName: "globe"),
-        Category(name: "Java Studies", cards: [], description: "Basic java sintax", imageSystemName: "cup.and.heat.waves.fill"),
-        Category(name: "Swift and UIKit", cards: [], description: "Studies of iOS Development", imageSystemName: "swift"),
-        Category(name: "English", cards: [], description: "Basic words and phrases", imageSystemName: "globe"),
-        Category(name: "Java Studies", cards: [], description: "Basic java sintax", imageSystemName: "cup.and.heat.waves.fill"),
-        Category(name: "Swift and UIKit", cards: [], description: "Studies of iOS Development", imageSystemName: "swift"),
-        Category(name: "English", cards: [], description: "Basic words and phrases", imageSystemName: "globe"),
-        Category(name: "Java Studies", cards: [], description: "Basic java sintax", imageSystemName: "cup.and.heat.waves.fill"),
-        Category(name: "Swift and UIKit", cards: [], description: "Studies of iOS Development", imageSystemName: "swift"),
-        Category(name: "English", cards: [], description: "Basic words and phrases", imageSystemName: "globe"),
-        Category(name: "Java Studies", cards: [], description: "Basic java sintax", imageSystemName: "cup.and.heat.waves.fill"),
-        Category(name: "Swift and UIKit", cards: [], description: "Studies of iOS Development", imageSystemName: "swift"),
-        
+            
     ]
     
     private init() {}

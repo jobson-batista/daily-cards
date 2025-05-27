@@ -54,6 +54,7 @@ class HomeViewController: UIViewController, ViewProtocol, UITableViewDelegate, U
         setupHierarchy()
         setupConstraints()
         setupTableView()
+        setupKeyboardObservers()
     }
     
     func setupConstraints() {
@@ -77,6 +78,8 @@ class HomeViewController: UIViewController, ViewProtocol, UITableViewDelegate, U
     
     func setupNavigationItem() {
         self.navigationItem.title = "Categorias de Estudo"
+        self.navigationController?.navigationBar.prefersLargeTitles = true
+        navigationItem.largeTitleDisplayMode = .automatic
         let searchController = UISearchController()
         searchController.searchResultsUpdater = self
         searchController.searchBar.placeholder = "Buscar categoria"
@@ -133,6 +136,35 @@ class HomeViewController: UIViewController, ViewProtocol, UITableViewDelegate, U
             self.categoriesFiltred = self.categories
         }
         tableView.reloadData()
+    }
+    
+    private func setupKeyboardObservers() {
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow(notification:)), name: UIResponder.keyboardWillShowNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide(notification:)), name: UIResponder.keyboardWillHideNotification, object: nil)
+    }
+    
+    func setupDismissKeyboardOnTap() {
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
+        tapGesture.cancelsTouchesInView = false
+        view.addGestureRecognizer(tapGesture)
+    }
+    
+    @objc private func keyboardWillShow(notification: Notification) {
+        if let keyboardFrame = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect {
+            tableView.contentInset.bottom = keyboardFrame.height + 10
+        }
+    }
+    
+    @objc private func keyboardWillHide(notification: Notification) {
+        tableView.contentInset.bottom = 0
+    }
+    
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+    }
+    
+    @objc func dismissKeyboard() {
+        view.endEditing(true)
     }
 
 }
