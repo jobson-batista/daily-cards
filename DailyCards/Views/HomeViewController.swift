@@ -32,24 +32,11 @@ class HomeViewController: UIViewController, ViewProtocol, UITableViewDelegate, U
         return tableView
     }()
     
-    public lazy var createCategoryButton: UIButton = {
-        let button = UIButton()
-        button.translatesAutoresizingMaskIntoConstraints = false
-        button.layer.cornerRadius = 5
-        button.backgroundColor = .buttonPrimary
-        button.tintColor = .textPrimary
-        button.setTitle("Criar Categoria", for: .normal)
-        button.setImage(UIImage(systemName: "plus"), for: .normal)
-        button.addTarget(self, action: #selector(addCategory), for: .touchUpInside)
-        return button
-    }()
-    
     override func viewDidLoad() {
         super.viewDidLoad()
         Log.info("Rodando... \(String(describing: type(of: self)))")
         view.backgroundColor = .backgroud
         updateData()
-        
         
         setupNavigationItem()
         setupHierarchy()
@@ -64,15 +51,12 @@ class HomeViewController: UIViewController, ViewProtocol, UITableViewDelegate, U
             stackView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
             stackView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 20),
             stackView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -20),
-            
-            createCategoryButton.heightAnchor.constraint(equalToConstant: 50),
-            
+                        
         ])
     }
     
     func setupHierarchy() {
         stackView.addArrangedSubview(tableView)
-        stackView.addArrangedSubview(createCategoryButton)
         
         view.addSubview(stackView)
     }
@@ -86,6 +70,15 @@ class HomeViewController: UIViewController, ViewProtocol, UITableViewDelegate, U
         searchController.searchBar.placeholder = "Buscar categoria"
         searchController.isActive = true
         self.navigationItem.searchController = searchController
+        
+        let addCategoryButton = UIBarButtonItem(
+            image: UIImage(systemName: "plus.app"),
+            style: .plain,
+            target: self,
+            action: #selector(addCategory)
+        )
+        
+        navigationItem.rightBarButtonItem = addCategoryButton
     }
     
     func setupTableView() {
