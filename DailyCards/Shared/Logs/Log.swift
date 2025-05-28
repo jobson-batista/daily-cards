@@ -12,7 +12,7 @@ class Log {
     
     private static let dateFormatter: DateFormatter = {
         let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
+        formatter.dateFormat = "dd-MM-yyyy HH:mm:ss"
         return formatter
     }()
 

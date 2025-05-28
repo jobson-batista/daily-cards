@@ -12,6 +12,7 @@ class CardModelView {
     
     private let cards: [Card] = [
         Card(question: "O que é Java?", answer: "É uma linguagem de programação.", category: CategoryModelView.shared.fetchData()[1]),
+        Card(question: "O que é Swift?", answer: "É uma linguagem de programação.", category: CategoryModelView.shared.fetchData()[2]),
         Card(question: "Traduza: What about you?", answer: "E você?", category: CategoryModelView.shared.fetchData()[0]),
         Card(question: "Traduza: Jam", answer: "Geléia", category: CategoryModelView.shared.fetchData()[0])
     ]

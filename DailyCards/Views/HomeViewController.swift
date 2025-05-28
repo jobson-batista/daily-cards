@@ -40,6 +40,7 @@ class HomeViewController: UIViewController, ViewProtocol, UITableViewDelegate, U
         button.tintColor = .textPrimary
         button.setTitle("Criar Categoria", for: .normal)
         button.setImage(UIImage(systemName: "plus"), for: .normal)
+        button.addTarget(self, action: #selector(addCategory), for: .touchUpInside)
         return button
     }()
     
@@ -47,8 +48,8 @@ class HomeViewController: UIViewController, ViewProtocol, UITableViewDelegate, U
         super.viewDidLoad()
         Log.info("Rodando... \(String(describing: type(of: self)))")
         view.backgroundColor = .backgroud
-        categories = categoryModelView.fetchData()
-        categoriesFiltred = categories
+        updateData()
+        
         
         setupNavigationItem()
         setupHierarchy()
@@ -113,7 +114,6 @@ class HomeViewController: UIViewController, ViewProtocol, UITableViewDelegate, U
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        Log.info("Selecionou: \(categoriesFiltred[indexPath.row].name)")
         tableView.deselectRow(at: indexPath, animated: true)
     }
     
@@ -149,6 +149,11 @@ class HomeViewController: UIViewController, ViewProtocol, UITableViewDelegate, U
         view.addGestureRecognizer(tapGesture)
     }
     
+    func updateData() {
+        categories = categoryModelView.fetchData()
+        categoriesFiltred = categories
+    }
+    
     @objc private func keyboardWillShow(notification: Notification) {
         if let keyboardFrame = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect {
             tableView.contentInset.bottom = keyboardFrame.height + 10
@@ -165,6 +170,20 @@ class HomeViewController: UIViewController, ViewProtocol, UITableViewDelegate, U
     
     @objc func dismissKeyboard() {
         view.endEditing(true)
+    }
+    
+    @objc func addCategory() {
+        let addCategoryModal = AddCategoryModalViewController()
+        addCategoryModal.modalPresentationStyle = .automatic
+        addCategoryModal.modalTransitionStyle = .coverVertical
+        let newNavController = UINavigationController(rootViewController: addCategoryModal)
+        addCategoryModal.onSaveCategory = { [weak self] in
+            self?.updateData()
+            self?.tableView.reloadData()
+        }
+        
+        present(newNavController, animated: true, completion: nil)
+        tableView.reloadData()
     }
 
 }
