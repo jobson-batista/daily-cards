@@ -40,6 +40,7 @@ class HomeViewController: UIViewController, ViewProtocol, UITableViewDelegate, U
         button.tintColor = .textPrimary
         button.setTitle("Criar Categoria", for: .normal)
         button.setImage(UIImage(systemName: "plus"), for: .normal)
+        button.addTarget(self, action: #selector(addCategory), for: .touchUpInside)
         return button
     }()
     
@@ -47,13 +48,14 @@ class HomeViewController: UIViewController, ViewProtocol, UITableViewDelegate, U
         super.viewDidLoad()
         Log.info("Rodando... \(String(describing: type(of: self)))")
         view.backgroundColor = .backgroud
-        categories = categoryModelView.fetchData()
-        categoriesFiltred = categories
+        updateData()
+        
         
         setupNavigationItem()
         setupHierarchy()
         setupConstraints()
         setupTableView()
+        setupKeyboardObservers()
     }
     
     func setupConstraints() {
@@ -77,6 +79,8 @@ class HomeViewController: UIViewController, ViewProtocol, UITableViewDelegate, U
     
     func setupNavigationItem() {
         self.navigationItem.title = "Categorias de Estudo"
+        self.navigationController?.navigationBar.prefersLargeTitles = true
+        navigationItem.largeTitleDisplayMode = .automatic
         let searchController = UISearchController()
         searchController.searchResultsUpdater = self
         searchController.searchBar.placeholder = "Buscar categoria"
@@ -110,7 +114,6 @@ class HomeViewController: UIViewController, ViewProtocol, UITableViewDelegate, U
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        Log.info("Selecionou: \(categoriesFiltred[indexPath.row].name)")
         tableView.deselectRow(at: indexPath, animated: true)
     }
     
@@ -132,6 +135,54 @@ class HomeViewController: UIViewController, ViewProtocol, UITableViewDelegate, U
         } else {
             self.categoriesFiltred = self.categories
         }
+        tableView.reloadData()
+    }
+    
+    private func setupKeyboardObservers() {
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow(notification:)), name: UIResponder.keyboardWillShowNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide(notification:)), name: UIResponder.keyboardWillHideNotification, object: nil)
+    }
+    
+    func setupDismissKeyboardOnTap() {
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
+        tapGesture.cancelsTouchesInView = false
+        view.addGestureRecognizer(tapGesture)
+    }
+    
+    func updateData() {
+        categories = categoryModelView.fetchData()
+        categoriesFiltred = categories
+    }
+    
+    @objc private func keyboardWillShow(notification: Notification) {
+        if let keyboardFrame = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect {
+            tableView.contentInset.bottom = keyboardFrame.height + 10
+        }
+    }
+    
+    @objc private func keyboardWillHide(notification: Notification) {
+        tableView.contentInset.bottom = 0
+    }
+    
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+    }
+    
+    @objc func dismissKeyboard() {
+        view.endEditing(true)
+    }
+    
+    @objc func addCategory() {
+        let addCategoryModal = AddCategoryModalViewController()
+        addCategoryModal.modalPresentationStyle = .automatic
+        addCategoryModal.modalTransitionStyle = .coverVertical
+        let newNavController = UINavigationController(rootViewController: addCategoryModal)
+        addCategoryModal.onSaveCategory = { [weak self] in
+            self?.updateData()
+            self?.tableView.reloadData()
+        }
+        
+        present(newNavController, animated: true, completion: nil)
         tableView.reloadData()
     }
 

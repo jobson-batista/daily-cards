@@ -20,7 +20,7 @@ class CategoryCell: UITableViewCell,  ViewProtocol {
         stack.alignment = .center
         stack.semanticContentAttribute = .forceLeftToRight
         stack.backgroundColor = .white
-        stack.layer.cornerRadius = 5
+        stack.layer.cornerRadius = 10
         return stack
     }()
     

@@ -29,7 +29,7 @@ class Card: ModelBase {
     }
     
     public func isDeleted() -> Bool {
-        if let deleted = self.deletedAt {
+        if self.deletedAt != nil {
             return true
         }
         return false
