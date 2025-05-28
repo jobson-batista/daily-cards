@@ -169,10 +169,13 @@ class AddCategoryModalViewController: UIViewController, ViewProtocol, UITextFiel
     @objc func save() {
         let newCategory = Category(name: self.nameTextField.text ?? "", cards: [], description: self.descriptionTextView.text, imageSystemName: self.selectedSymbolName)
         
-        let categoryModelView = CategoryModelView.shared
-        categoryModelView.addCategory(category: newCategory)
-        onSaveCategory?() // Notificar HomeVC
-        dismiss(animated: true, completion: nil)
+        if (isValidFields()) {
+            let categoryModelView = CategoryModelView.shared
+            categoryModelView.addCategory(category: newCategory)
+            onSaveCategory?() // Notificar HomeVC
+            dismiss(animated: true, completion: nil)
+        }
+        
     }
     
     @objc func cancel() {
@@ -245,4 +248,26 @@ class AddCategoryModalViewController: UIViewController, ViewProtocol, UITextFiel
         return newString.count <= maxLength
     }
     
+    private func alert(_ title: String, _ message: String) {
+        let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
+        present(alert, animated: true, completion: nil)
+    }
+    
+    private func isValidFields() -> Bool {
+        if (nameTextField.text == nil || nameTextField.text?.trimmingCharacters(in: .whitespacesAndNewlines) == "") {
+            Log.error("O campo Nome não pode ser vazio!")
+            alert("Atenção", "O campo Nome não pode ser vazio!")
+            return false
+        } else if (descriptionTextView.text == nil || descriptionTextView.text.trimmingCharacters(in: .whitespacesAndNewlines) == "") {
+            Log.error("O campo Descrição não pode ser vazio!")
+            alert("Atenção", "O campo Descrição não pode ser vazio!")
+            return false
+        } else if (selectedSymbolName.trimmingCharacters(in: .whitespacesAndNewlines) == "") {
+            Log.error("O campo Symbol Name não pode ser vazio!")
+            alert("Atenção", "Selecione um ícone válido!")
+            return false
+        }
+        return true
+    }
 }
